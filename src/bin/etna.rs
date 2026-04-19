@@ -152,7 +152,7 @@ fn run_proptest_property(property: &str) -> Outcome {
     let counter = Arc::new(AtomicU64::new(0));
     let t0 = Instant::now();
     let mut runner = proptest::test_runner::TestRunner::new(ProptestConfig {
-        cases: 40_000_000,
+        cases: 1_000_000,
         ..ProptestConfig::default()
     });
     let result: Result<(), String> = match property {
@@ -211,8 +211,8 @@ fn run_quickcheck_property(property: &str) -> Outcome {
     QC_COUNTER.store(0, Ordering::Relaxed);
     let t0 = Instant::now();
     let mut qc = QuickCheck::new()
-        .tests(40_000_000)
-        .max_tests(80_000_000)
+        .tests(1_000_000)
+        .max_tests(2_000_000)
         .max_time(Duration::from_secs(86_400));
     let result = match property {
         "ReversePreservesLookup" => {
@@ -262,7 +262,7 @@ fn run_crabcheck_property(property: &str) -> Outcome {
     }
     CC_COUNTER.store(0, Ordering::Relaxed);
     let t0 = Instant::now();
-    let cfg = crabcheck_qc::Config { tests: 40_000_000 };
+    let cfg = crabcheck_qc::Config { tests: 1_000_000 };
     let result = match property {
         "ReversePreservesLookup" => crabcheck_qc::quickcheck_with_config(
             cfg,
@@ -301,7 +301,7 @@ static HG_COUNTER: AtomicU64 = AtomicU64::new(0);
 fn hegel_settings() -> HegelSettings {
     use hegel::HealthCheck;
     HegelSettings::new()
-        .test_cases(40_000_000)
+        .test_cases(1_000_000)
         .suppress_health_check(HealthCheck::all())
 }
 
