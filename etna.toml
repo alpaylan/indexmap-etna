@@ -1,0 +1,22 @@
+# ETNA workload index for indexmap.
+#
+# One [[variant]] per injected mutation. Source of truth for variant->property
+# mapping. Every other fact is derivable from the source tree:
+#   - ls patches/*.patch                          (patch-based variants)
+#   - grep -rn "pub fn property_" src/etna.rs     (property functions)
+#   - grep -rn "fn witness_.*_case_" tests/       (witness tests)
+#
+# Base commit for this workload is HEAD of master on this tree. Every
+# etna/<variant> branch is master + exactly one patch applied on top.
+
+[[variant]]
+name = "reverse_indices_offbyone_a442475_1"
+property = "reverse_preserves_lookup"
+injection = "patch"
+patch = "patches/reverse_indices_offbyone_a442475_1.patch"
+source_commit = "a442475ab6a0ddefd886aed1938e6486e4aed1f8"
+witnesses = [
+    "witness_reverse_preserves_lookup_case_three_keys",
+]
+frameworks = ["proptest", "quickcheck", "crabcheck", "hegel"]
+files = ["src/inner.rs"]

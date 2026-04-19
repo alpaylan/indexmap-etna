@@ -120,6 +120,9 @@ mod util;
 pub mod map;
 pub mod set;
 
+#[cfg(feature = "std")]
+pub mod etna;
+
 // Placed after `map` and `set` so new `rayon` methods on the types
 // are documented after the "normal" methods.
 #[cfg(feature = "rayon")]

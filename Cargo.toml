@@ -18,13 +18,19 @@ equivalent = { version = "1.0", default-features = false }
 hashbrown = { version = "0.17", default-features = false }
 
 arbitrary = { version = "1.0", optional = true, default-features = false }
-quickcheck = { version = "1.0", optional = true, default-features = false }
 serde_core = { version = "1.0.220", optional = true, default-features = false }
 rayon = { version = "1.9", optional = true }
 sval = { version = "2", optional = true, default-features = false }
 
 # deprecated: use borsh's "indexmap" feature instead.
 borsh = { version = "1.2", optional = true, default-features = false }
+
+# ETNA runner dependencies. Regular deps so src/bin/etna.rs can use them.
+quickcheck = { path = "/Users/akeles/Programming/projects/PbtBenchmark/quickcheck", features = ["etna"] }
+proptest = "1"
+crabcheck = { path = "/Users/akeles/Programming/projects/PbtBenchmark/crabcheck" }
+hegeltest = "0.3.7"
+rand = "0.9"
 
 # serde v1.0.220 is the first version that released with `serde_core`.
 # This is required to avoid conflict with other `serde` users which may require an older version.
@@ -34,7 +40,6 @@ serde = { version = "1.0.220", default-features = false, optional = true }
 [dev-dependencies]
 itertools = "0.14"
 fastrand = { version = "2", default-features = false }
-quickcheck = { version = "1.1", default-features = false }
 fnv = "1.0"
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 
@@ -42,9 +47,16 @@ serde = { version = "1.0", default-features = false, features = ["derive"] }
 default = ["std"]
 std = []
 serde = ["dep:serde_core", "dep:serde"]
+# The quickcheck feature gates the `Arbitrary` impls for IndexMap/IndexSet
+# in src/arbitrary.rs. The dep itself is now non-optional (needed by the
+# etna runner) so this feature no longer lists a dep activation.
+quickcheck = []
 
 # for testing only, of course
 test_debug = []
+
+[profile.release]
+debug = true
 
 [profile.bench]
 debug = true
@@ -58,8 +70,12 @@ tag-name = "{{version}}"
 features = ["arbitrary", "quickcheck", "serde", "borsh", "rayon", "sval"]
 rustdoc-args = ["--cfg", "docsrs"]
 
+# test-nostd / test-serde / test-sval are out of the workspace for the ETNA
+# build — they test no-std / serde configurations that don't interact with
+# the property runner and just add noise to `cargo test` timing.
 [workspace]
-members = ["test-nostd", "test-serde", "test-sval"]
+members = []
+exclude = ["test-nostd", "test-serde", "test-sval"]
 
 [lints.rust]
 private-bounds = "deny"
