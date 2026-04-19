@@ -301,7 +301,12 @@ static HG_COUNTER: AtomicU64 = AtomicU64::new(0);
 fn hegel_settings() -> HegelSettings {
     use hegel::HealthCheck;
     HegelSettings::new()
-        .test_cases(1_000_000)
+        // hegeltest 0.3.7 uses a Python subprocess backend; each `tc.draw()`
+        // crosses that boundary, so per-case cost is ~100 ms. Keep the hegel
+        // budget small enough that base runs finish in minutes while still
+        // exceeding the typical bug-finding horizon (the reverse off-by-one
+        // fires in the first few cases).
+        .test_cases(2_000)
         .suppress_health_check(HealthCheck::all())
 }
 
