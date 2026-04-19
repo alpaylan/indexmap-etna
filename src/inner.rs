@@ -479,7 +479,7 @@ impl<K, V> Core<K, V> {
         // be, given that this is an in-place reversal.
         let len = self.entries.len();
         for i in &mut self.indices {
-            *i = len - *i - 1;
+            *i = len - *i;
         }
     }
 
