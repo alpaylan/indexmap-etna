@@ -12,7 +12,7 @@ use crabcheck::quickcheck::Arbitrary as CcArbitrary;
 use hegel::{generators as hgen, Hegel, Settings as HegelSettings};
 use indexmap::etna::{property_reverse_preserves_lookup, PropertyResult};
 use proptest::prelude::*;
-use proptest::test_runner::{Config as ProptestConfig, TestCaseError, TestError, TestRunner};
+use proptest::test_runner::{Config as ProptestConfig, TestCaseError, TestError};
 use quickcheck::{Arbitrary as QcArbitrary, Gen, QuickCheck, ResultStatus, TestResult};
 use rand::Rng;
 use std::fmt;
@@ -151,7 +151,7 @@ fn run_proptest_property(property: &str) -> Outcome {
     }
     let counter = Arc::new(AtomicU64::new(0));
     let t0 = Instant::now();
-    let mut runner = TestRunner::new(ProptestConfig {
+    let mut runner = proptest::test_runner::TestRunner::new(ProptestConfig {
         cases: 40_000_000,
         ..ProptestConfig::default()
     });
