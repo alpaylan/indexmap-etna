@@ -1,22 +1,31 @@
-# ETNA workload index for indexmap.
-#
-# One [[variant]] per injected mutation. Source of truth for variant->property
-# mapping. Every other fact is derivable from the source tree:
-#   - ls patches/*.patch                          (patch-based variants)
-#   - grep -rn "pub fn property_" src/etna.rs     (property functions)
-#   - grep -rn "fn witness_.*_case_" tests/       (witness tests)
-#
-# Base commit for this workload is HEAD of master on this tree. Every
-# etna/<variant> branch is master + exactly one patch applied on top.
+name = "indexmap"
+language = "rust"
+crate = "indexmap"
+base_commit = "d25577c5e68d853e7073e3d4857a50fe78a55daa"
 
-[[variant]]
-name = "reverse_indices_offbyone_a442475_1"
-property = "reverse_preserves_lookup"
-injection = "patch"
-patch = "patches/reverse_indices_offbyone_a442475_1.patch"
-source_commit = "a442475ab6a0ddefd886aed1938e6486e4aed1f8"
-witnesses = [
-    "witness_reverse_preserves_lookup_case_three_keys",
-]
-frameworks = ["proptest", "quickcheck", "crabcheck", "hegel"]
+[[tasks]]
+mutations = ["reverse_indices_offbyone_a442475_1"]
+
+[tasks.source]
+repo = "https://github.com/indexmap-rs/indexmap"
+commits = ["a442475ab6a0ddefd886aed1938e6486e4aed1f8"]
+commit_subjects = ["Fix off-by-one error in reindexing after `reverse`"]
+prs = [128]
+summary = "The initial `IndexMap::reverse` implementation reindexed hash-table entries as `len - i` instead of `len - i - 1`, so every stored index was off by one. Lookups after `reverse` then returned the wrong bucket's value or panicked out of bounds."
+
+[tasks.injection]
+kind = "patch"
 files = ["src/inner.rs"]
+locations = [{ file = "src/inner.rs" }]
+patch = "patches/reverse_indices_offbyone_a442475_1.patch"
+
+[tasks.bug]
+short_name = "reverse_indices_offbyone"
+invariant = "After `IndexMap::reverse()`, every previously inserted key must still map to its originally inserted value — only the iteration order flips, the key→value relation is preserved."
+how_triggered = "The post-reverse reindexing loop in `Core::reverse` rewrites every hash-table entry as `*i = len - *i` instead of the correct `*i = len - *i - 1`. Every stored index is therefore shifted one slot past its true position — the entry originally at index 0 gets index `len` (out of bounds), so subsequent `map.get(k)` either returns the wrong bucket's value or panics when indexing into `self.entries[len]`. Any map with two or more distinct keys exposes the bug; `catch_unwind` inside the property converts the panic into a `PropertyResult::Fail`."
+
+[[tasks.tasks]]
+property = "ReversePreservesLookup"
+witnesses = [
+  { test_fn = "witness_reverse_preserves_lookup_case_three_keys" },
+]

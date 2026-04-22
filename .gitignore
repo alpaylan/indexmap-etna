@@ -1,2 +1,7 @@
 target
 Cargo.lock
+.marauders/
+.migration-cache/
+.hegel/
+etna.log
+progress.jsonl
