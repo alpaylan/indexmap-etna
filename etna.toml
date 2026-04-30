@@ -1,5 +1,6 @@
 name = "indexmap"
 language = "rust"
+strategies = ["proptest", "quickcheck", "crabcheck", "hegel"]
 crate = "indexmap"
 base_commit = "d25577c5e68d853e7073e3d4857a50fe78a55daa"
 
