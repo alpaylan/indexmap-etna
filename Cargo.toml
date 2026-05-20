@@ -55,6 +55,10 @@ quickcheck = []
 # for testing only, of course
 test_debug = []
 
+[[bin]]
+name = "etna-faultloc"
+path = "src/bin/etna-faultloc.rs"
+
 [profile.release]
 debug = true
 
